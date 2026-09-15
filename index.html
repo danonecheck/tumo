@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
   :root{
     --black:#1b1c1c;
@@ -251,6 +252,61 @@
   .note.warn{background:#fbeee0;color:#7a4f1c;}
   .note.info{background:#eaf1fb;color:#2c4a6e;}
 
+  .group-block{
+    margin-top:14px;
+    border:2px dashed var(--purple);
+    border-radius:14px;
+    padding:18px;
+    display:flex;
+    align-items:center;
+    gap:18px;
+    font-family:'Manrope',sans-serif;
+  }
+  .group-qr{
+    flex-shrink:0;
+    width:120px;
+    height:120px;
+    line-height:0;
+  }
+  .group-qr img, .group-qr canvas{
+    border-radius:10px;
+  }
+  .group-text{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .group-title{
+    font-size:14.5px;
+    font-weight:800;
+    color:var(--black);
+  }
+  .group-link{
+    font-size:13.5px;
+    color:var(--purple-deep);
+    word-break:break-all;
+    text-decoration:none;
+  }
+  .group-link:hover{text-decoration:underline;}
+  .group-join-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    align-self:flex-start;
+    background:#25D366;
+    color:#fff;
+    font-weight:800;
+    font-size:14px;
+    text-decoration:none;
+    padding:10px 20px;
+    border-radius:999px;
+  }
+  @media (max-width:520px){
+    .group-block{flex-direction:column;text-align:center;}
+    .group-text{align-items:center;}
+    .group-join-btn{align-self:center;}
+  }
+
   /* ---------- FAQ ---------- */
   .faq{margin-top:56px;}
   .faq-item{
@@ -434,6 +490,21 @@
     return COACH_EMAILS[primary] || '';
   }
 
+  const GROUP_LINKS = {
+    'pn_cht_1030': { name: 'Пн/Чт 10:30–12:30', link: 'https://chat.whatsapp.com/Bux2Ep5f0AK3lFvTNE9MLT' },
+    'pn_cht_1430': { name: 'Пн/Чт 14:30–16:30', link: 'https://chat.whatsapp.com/CdKA9oHpWxdDp4e1RZOBJU' },
+    'pn_cht_1630': { name: 'Пн/Чт 16:30–18:30', link: 'https://chat.whatsapp.com/HO5hTYGAQfX8kyShNzdd5J' },
+    'vt_pt_1030':  { name: 'Вт/Пт 10:30–12:30', link: 'https://chat.whatsapp.com/LpF7RL8VbQb9GTLLSq8m6k' },
+    'vt_pt_1430':  { name: 'Вт/Пт 14:30–16:30', link: 'https://chat.whatsapp.com/KDtxPBsHlOmG07wX6BIM7Q' },
+    'vt_pt_1630':  { name: 'Вт/Пт 16:30–18:30', link: 'https://chat.whatsapp.com/Ii5VjHgsA2L0DO7UNM1IgH' },
+  };
+
+  function groupKeyFor(day, time){
+    const pair = (day === 'Понедельник' || day === 'Четверг') ? 'pn_cht' : 'vt_pt';
+    const slot = time === '10:30-12:30' ? '1030' : time === '14:30-16:30' ? '1430' : '1630';
+    return pair + '_' + slot;
+  }
+
   const WA_PHONE = '77759034013';
   const WA_DISPLAY = '+7 775 903 4013';
   const CONTACT_EMAIL = 'info.astana@tumo.kz';
@@ -470,6 +541,8 @@
       noteSame:'Коуч остался прежним — меняется только день/время занятия.',
       noteWarn:'Коуч по этой группе ещё уточняется — сообщим дополнительно.',
       noteWorkshop:'Если ученик записан на предстоящий воркшоп, необходимо проверить электронную почту и найти письмо с приглашением, содержащим всю необходимую информацию.',
+      groupBlockTitle:'Группа родителей в WhatsApp',
+      groupJoinBtn:'Присоединиться',
       faqTitle:'Частые вопросы о TUMO',
       contactTitle:'В случае возникновения вопросов или необходимости уточнения статуса заявки',
       contactText:'Если информация о расписании отсутствует или требует уточнения, свяжитесь с нами.\nДля идентификации учащегося в системе укажите его полные ФИО.',
@@ -511,6 +584,8 @@
       noteSame:'Коуч өзгермеді — тек сабақтың күні/уақыты ауысады.',
       noteWarn:'Бұл топтың коучы әлі нақтыланып жатыр — қосымша хабарлаймыз.',
       noteWorkshop:'Егер оқушы алдағы воркшопқа жазылған болса, электрондық поштаны тексеріп, барлық қажетті ақпараты бар шақыру хатын табу қажет.',
+      groupBlockTitle:'WhatsApp-тағы ата-аналар тобы',
+      groupJoinBtn:'Қосылу',
       faqTitle:'TUMO туралы жиі қойылатын сұрақтар',
       contactTitle:'Егер сұрақтарыңыз болса немесе өтінім мәртебесін нақтылау қажет болса',
       contactText:'Кесте туралы ақпарат жоқ болса немесе нақтылауды қажет етсе, бізбен байланысыңыз.\nЖүйеде оқушыны анықтау үшін оның толық аты-жөнін көрсетіңіз.',
@@ -612,10 +687,12 @@
       hint.textContent = t('multiMatch')(list.length);
       results.appendChild(hint);
     }
-    list.forEach(r => {
+    list.forEach((r, index) => {
       const changed = r.c && r.ex && r.c !== r.ex;
       const noCoach = !r.c;
       const email = coachEmail(r.c);
+      const gKey = groupKeyFor(r.d, r.t);
+      const group = GROUP_LINKS[gKey];
       const card = document.createElement('div');
       card.className = 'card';
       card.innerHTML = `
@@ -648,8 +725,20 @@
           : (changed ? `<div class="note">${t('noteChanged')}</div>` : `<div class="note">${t('noteSame')}</div>`)
         }
         <div class="note info">${t('noteWorkshop')}</div>
+        ${group ? `
+        <div class="group-block">
+          <div class="group-qr" id="qr-${index}"></div>
+          <div class="group-text">
+            <div class="group-title">${t('groupBlockTitle')}: ${group.name}</div>
+            <a class="group-link" href="${group.link}" target="_blank" rel="noopener">${group.link}</a>
+            <a class="group-join-btn" href="${group.link}" target="_blank" rel="noopener">${t('groupJoinBtn')}</a>
+          </div>
+        </div>` : ''}
       `;
       results.appendChild(card);
+      if(group){
+        new QRCode(document.getElementById('qr-'+index), { text: group.link, width: 120, height: 120, colorDark: '#1b1c1c', colorLight: '#ffffff' });
+      }
     });
   }
 
